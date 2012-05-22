@@ -1,0 +1,121 @@
+<h1>Listing sasmaps</h1>
+
+<table>
+  <tr>
+    <th>Sku</th>
+    <th>Name</th>
+    <th>Url to product</th>
+    <th>Price</th>
+    <th>Retail price</th>
+    <th>Url to image</th>
+    <th>Url to thumbnail image</th>
+    <th>Commission</th>
+    <th>Category</th>
+    <th>Subcategory</th>
+    <th>Description</th>
+    <th>Searchterms</th>
+    <th>Status</th>
+    <th>Merchantid</th>
+    <th>Custom 1</th>
+    <th>Custom 2</th>
+    <th>Custom 3</th>
+    <th>Custom 4</th>
+    <th>Custom 5</th>
+    <th>Storeid</th>
+    <th>Manufacturer</th>
+    <th>Partnumber</th>
+    <th>Merchantcategory</th>
+    <th>Merchantsubcategory</th>
+    <th>Shortdescription</th>
+    <th>Isbn</th>
+    <th>Upc</th>
+    <th>Crosssell</th>
+    <th>Merchantgroup</th>
+    <th>Merchantsubgroup</th>
+    <th>Compatiblewith</th>
+    <th>Compareto</th>
+    <th>Quantitydiscount</th>
+    <th>Bestseller</th>
+    <th>Addtocarturl</th>
+    <th>Reviewsrssurl</th>
+    <th>Option1</th>
+    <th>Option2</th>
+    <th>Option3</th>
+    <th>Option4</th>
+    <th>Option5</th>
+    <th>Reservedforfutureuse1</th>
+    <th>Reservedforfutureuse2</th>
+    <th>Reservedforfutureuse3</th>
+    <th>Reservedforfutureuse4</th>
+    <th>Reservedforfutureuse5</th>
+    <th>Reservedforfutureuse6</th>
+    <th>Reservedforfutureuse7</th>
+    <th>Reservedforfutureuse8</th>
+    <th>Reservedforfutureuse9</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @sasmaps.each do |sasmap| %>
+  <tr>
+    <td><%= sasmap.SKU %></td>
+    <td><%= sasmap.name %></td>
+    <td><%= sasmap.URL_to_product %></td>
+    <td><%= sasmap.price %></td>
+    <td><%= sasmap.Retail_Price %></td>
+    <td><%= sasmap.URL_to_image %></td>
+    <td><%= sasmap.URL_to_thumbnail_image %></td>
+    <td><%= sasmap.Commission %></td>
+    <td><%= sasmap.Category %></td>
+    <td><%= sasmap.Subcategory %></td>
+    <td><%= sasmap.Description %></td>
+    <td><%= sasmap.SearchTerms %></td>
+    <td><%= sasmap.Status %></td>
+    <td><%= sasmap.MerchantID %></td>
+    <td><%= sasmap.Custom_1 %></td>
+    <td><%= sasmap.Custom_2 %></td>
+    <td><%= sasmap.Custom_3 %></td>
+    <td><%= sasmap.Custom_4 %></td>
+    <td><%= sasmap.Custom_5 %></td>
+    <td><%= sasmap.StoreID %></td>
+    <td><%= sasmap.Manufacturer %></td>
+    <td><%= sasmap.PartNumber %></td>
+    <td><%= sasmap.MerchantCategory %></td>
+    <td><%= sasmap.MerchantSubCategory %></td>
+    <td><%= sasmap.ShortDescription %></td>
+    <td><%= sasmap.ISBN %></td>
+    <td><%= sasmap.UPC %></td>
+    <td><%= sasmap.CrossSell %></td>
+    <td><%= sasmap.MerchantGroup %></td>
+    <td><%= sasmap.MerchantSubgroup %></td>
+    <td><%= sasmap.CompatibleWith %></td>
+    <td><%= sasmap.CompareTo %></td>
+    <td><%= sasmap.QuantityDiscount %></td>
+    <td><%= sasmap.Bestseller %></td>
+    <td><%= sasmap.AddToCartURL %></td>
+    <td><%= sasmap.ReviewsRSSURL %></td>
+    <td><%= sasmap.Option1 %></td>
+    <td><%= sasmap.Option2 %></td>
+    <td><%= sasmap.Option3 %></td>
+    <td><%= sasmap.Option4 %></td>
+    <td><%= sasmap.Option5 %></td>
+    <td><%= sasmap.ReservedForFutureUse1 %></td>
+    <td><%= sasmap.ReservedForFutureUse2 %></td>
+    <td><%= sasmap.ReservedForFutureUse3 %></td>
+    <td><%= sasmap.ReservedForFutureUse4 %></td>
+    <td><%= sasmap.ReservedForFutureUse5 %></td>
+    <td><%= sasmap.ReservedForFutureUse6 %></td>
+    <td><%= sasmap.ReservedForFutureUse7 %></td>
+    <td><%= sasmap.ReservedForFutureUse8 %></td>
+    <td><%= sasmap.ReservedForFutureUse9 %></td>
+    <td><%= link_to 'Show', sasmap %></td>
+    <td><%= link_to 'Edit', edit_sasmap_path(sasmap) %></td>
+    <td><%= link_to 'Destroy', sasmap, confirm: 'Are you sure?', method: :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Sasmap', new_sasmap_path %>
