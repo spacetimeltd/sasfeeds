@@ -34,6 +34,21 @@ task :csv_model_import, [ :filename, :model ] => [ :environment ] do |task,args|
     end
 end
 
+task :show_off => :environment do
+    Sasproduct.where(:storeid => "1").each { |p| puts p.name }
+    Sasproduct.where(:storeid => "2").each { |p| puts p.name }
+    puts "How many with :StoreID 1?"
+    Sasproduct.where(:storeid => "1").count
+    puts "How many with :StoreID 2?"
+    Sasproduct.where(:storeid => [1]).count
+    puts "How many with both?"
+    Sasproduct.where(:storeid => [1..2]).count
+end
+
+task :delete_all_storeid_2 => :environment do
+    Sasproduct.delete(Sasproduct.where(:storeid => "2").map { |p| p.id })
+end
+
 task :sasmap_3dcart => :environment do
     # ok, didn't have as much fun with the database as I would have liked so instead...
     # we're gonna grab the sas header (post modification) from the backup file
@@ -81,9 +96,6 @@ task :sasmap_3dcart => :environment do
             data = cats[2]
         when /merchantsubgroup/i
             data = cats[3]
-            if data
-                binding.pry
-            end
         when /QuantityDiscount/i
             data = nil
         end
@@ -95,7 +107,6 @@ task :sasmap_3dcart => :environment do
 
         params[key] = data
       end
-      binding.pry
       Sasproduct.create(params);
     end
 end
