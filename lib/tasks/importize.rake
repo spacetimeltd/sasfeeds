@@ -89,7 +89,7 @@ task :sasmap_3dcart => :environment do
         end
 
         if data =~ /<\w+?>/
-            puts data + " is inkeyid, possibly\n"
+            puts data + " is invalid, possibly\n"
         end
         puts "#{i}\t|\t#{key}\t|\t#{data}"
 
