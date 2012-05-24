@@ -1,7 +1,6 @@
 require 'csv'
 require 'pry'
 require 'action_view'
-require 'fileutils'
 
 # gen_sas goes first, then sasmap needs to be generated from the header
 # after that asproducts, wsproduct, maproducts, can be created
@@ -18,8 +17,6 @@ task :csv_model_import, [ :filename, :model ] => [ :environment ] do |task,args|
       puts "\nheading name 'id' changed to 'sku'\n"
     else
         if keys.index "id"
-            # TODO rename primary_key_field so that id can be used
-            # for the time being I'm changing 'id' to 'sku' in the 3dcart table
             puts "you have a field named id, but sql needs that"
             break
         end
@@ -37,23 +34,6 @@ task :csv_model_import, [ :filename, :model ] => [ :environment ] do |task,args|
     end
 end
 
-task :show_off => :environment do
-    Sasproduct.where(:storeid => "1").each { |p| puts p.name }
-    Sasproduct.where(:storeid => "2").each { |p| puts p.name }
-    puts "How many with :StoreID 1?"
-    Sasproduct.where(:storeid => "1").count
-    puts "How many with :StoreID 2?"
-    Sasproduct.where(:storeid => [1]).count
-    puts "How many with either?"
-    Sasproduct.where(:storeid => [1..2]).count
-end
-
-task :delete_all_storeid_2 => :environment do
-    Sasproduct.delete(Sasproduct.where(:storeid => "2").map { |p| p.id })
-    # or you can do it this way
-    Sasproduct.where(:storeid => "2").delete_all
-end
-
 task :sasmap_3dcart => :environment do
     # ok, didn't have as much fun with the database as I would have liked so instead...
     # we're gonna grab the sas header (post modification) from the backup file
@@ -62,61 +42,21 @@ task :sasmap_3dcart => :environment do
     sash = JSON.parse File.new("./data/sashead.json").readline
     asmap = Sasmap.first
 
-    if File.exists? "./data/exceptions.log"
-        FileUtils.rm "./data/exceptions.log"
-    end
-    outp = "columns:\nnotforsale | stock | sku | name | categories\n"
-    puts outp.encode!("cp1252")
-    File.open("./data/exceptions.log", "a+:cp1252") { |f| f << "#{outp}\n" }
-
-
     include ActionView::Helpers::SanitizeHelper
 
     # start with the mappings
     asproducts = Asproduct.all
     asproducts.each do |pdata|
-
-      # first weed out the products with no stock - or not for sale
-      skipit = false
-      if pdata.notforsale == "1" || pdata.stock == "0"
-          a = [:notforsale, :stock, :sku, :name, :categories].map { |x| pdata[x] }
-          outp = a.join " | "
-          if pdata.stock == "0"
-              if outp =~ /discontinued/i
-                  skipit = true
-              else
-                  outp += " <==== ### Not excluded from feed. ###"
-              end
-          end
-          if pdata.notforsale == "1"
-              skipit = true
-          end
-          puts outp.encode!("cp1252")
-          File.open("./data/exceptions.log", "a+:cp1252") { |f| f << "#{outp}\n" }
-          if skipit
-              next
-          end
-      end
-      # Ok, lets break it down
-      begin
-        cats = pdata[:categories].split("@").pop.split("/")
-      rescue
-        cats = []
-      end
-      # and build it up again
-      params = {}
-      asmap.attribute_names[1..-3].each_with_index do |key,i|
-        if pdata[asmap[key]] == nil
-          pdata[asmap[key]] = asmap[key] # asmap[key] contains default if no mapping
+      asmap.attribute_names[1..-3].each_with_index do |val,i|
+        if pdata[asmap[val]] == nil
+          pdata[asmap[val]] = asmap[val] # asmap[val] contains default if no mapping
         end
 
-        data = pdata[asmap[key]]
+        data = pdata[asmap[val]]
 
-        root = "http://www.arthritissupplies.com"
+        binding.pry
 
-        case key
-        when /status/i
-            data = "instock"
+        case val
         when /description/i
             data = strip_tags(data)
         when /url_to_product/i, /url_to_image/i, /url_to_thumbnail/i, /url_to\w+?/i
@@ -126,58 +66,25 @@ task :sasmap_3dcart => :environment do
                 data = "#{root}/#{data}"
             end
         when /merchantcategory/i
-            data = cats[0]
+            cat1
         when /merchantsubcategory/i
-            data = cats[1]
+            cat2
         when /merchantgroup/i
-            data = cats[2]
+            cat3
         when /merchantsubgroup/i
-            data = cats[3]
+            cat4
         when /QuantityDiscount/i
-            data = nil
+            sasprice
         end
 
         if data =~ /<\w+?>/
             puts data + " is invalid, possibly\n"
         end
-        #puts "#{i}\t|\t#{key}\t|\t#{data}"
+        puts "#{i}\t|\t#{val}\t|\t#{data}"
 
-        params[key] = data
       end
-      Sasproduct.create(params);
     end
 end
-
-task :export_sasfeed, [:storeid] => [:environment] do |task,args|
-    header = JSON.parse File.read("./data/sasspec.json")
-    
-    case args[:storeid]
-    when "1"
-        pdata = Sasproduct.where(:StoreID => "1")
-        file = "./data/wsproducts.csv"
-    when "2"
-        pdata = Asproduct.where(:StoreID => "2")
-        file = "./data/asproducts.csv"
-    when "3"
-        pdata = Cgproduct.where(:StoreID => "3")
-        file = "./data/cgproducts.csv"
-    when "4"
-        pdata = Maproduct.where(:StoreID => "4")
-        file = "./data/maproducts.csv"
-    end
-    fields = pdata.attribute_names[1..-3]
-    puts "selected attributes: #{fields}"
-
-    CSV.open(file, "wb:cp1252") do |csv|
-        csv << header
-        pdata.select(fields).each do |record|
-            csv << record.attributes.values
-        end
-    end
-end
-
-    
-
 
 task :gen_scaffold_args, [ :filename, :model ] => [ :environment ] do |task,args|
 
